@@ -5,36 +5,26 @@
 </template>
 
 <script>
-
 export default {
   name: 'App',
 
-  created () {
-    this.yubikey()
+  async mounted () {
+    await this.runKeyTest()
   },
 
   methods: {
-    async yubikey () {
-      if (!window.PublicKeyCredential) {
-        return alert(`Your web browser does not meet our security requirements.  Please
-        upgrade to Google Chrome or contact MeaVitae support for help.`)
-      }
-
-      console.log('------BEGIN CREATE CREDENTIALS------')
-
-      const decryptKeyIntoUserIdOnCreate = 'STRING TO DECRYPT KEY WRAPPER'
-
-      const createCredential = await navigator.credentials.create({
+    async createPublicKeyCredential (userId = '') {
+      return navigator.credentials.create({
         publicKey: {
           challenge: window.crypto.getRandomValues(new Uint8Array(10)),
 
           rp: {
-            name: 'dan'
+            name: 'Test'
           },
 
           user: {
-            id: Uint8Array.from(decryptKeyIntoUserIdOnCreate, c => c.charCodeAt(0)),
-            name: 'jim',
+            id: Uint8Array.from(userId, c => c.charCodeAt(0)),
+            name: 'Test Person',
             displayName: 'jim display'
           },
 
@@ -58,80 +48,68 @@ export default {
           }
         }
       })
+    },
 
-      console.log('id as base64', createCredential.id)
-
-      const rawIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(createCredential.rawId)))
-
-      console.log('rawId as base64', rawIdAsBase64)
-
-      const { authData } = window.CBOR.decode(createCredential.response.attestationObject)
-
-      const dataView = new DataView(new ArrayBuffer(2))
-      const idLenBytes = authData.slice(53, 55)
-      idLenBytes.forEach((value, index) => dataView.setUint8(index, value))
-      const credentialIdLength = dataView.getUint16()
-      const credentialId = authData.slice(55, 55 + credentialIdLength)
-
-      console.log('credentialId: ', credentialId)
-
-      const credentialIdAsBase64 = btoa(String.fromCharCode.apply(null, credentialId))
-
-      console.log('credentialIdAsBase64: ', credentialIdAsBase64)
-
-      console.log('IS rawId===credentialId', !!(rawIdAsBase64===credentialIdAsBase64))
-
-      const publicKeyBytes = authData.slice(55 + credentialIdLength)
-      console.log('publicKeyBytes: ', publicKeyBytes)
-
-      // authenticatorSelection.requireResidentKey = true makes CBOR.decode error
-      // const publicKeyObject = window.CBOR.decode(publicKeyBytes.buffer)
-      // console.log('publicKeyObject: ', publicKeyObject)
-
-      console.log('------END CREATE CREDENTIALS------')
-
-      const challenge = window.crypto.getRandomValues(new Uint8Array(10))
-      const credentialIdAsArrayBuffer = Uint8Array.from(atob(rawIdAsBase64), c => c.charCodeAt(0))
-
-      const credential = {
-        publicKey: {
-          challenge,
-          timeout: 120000, // 2 minutes
-          allowCredentials: [{
-            type: 'public-key',
-            id: credentialIdAsArrayBuffer
-          }]
-        }
+    async runKeyTest () {
+      if (!window.PublicKeyCredential) {
+        return alert(`Your web browser does not meet our security requirements.  Please
+        upgrade to Google Chrome or contact MeaVitae support for help.`)
       }
 
-      console.log('------BEGIN GET CREDENTIAL 1ST TIME------')
+      try {
+        console.log('------BEGIN CREATE CREDENTIALS 1------')
 
-      const getCredentialOne = await navigator.credentials.get(credential)
-      console.log('One response:', getCredentialOne.response)
-      const getCredentialOneSignatureAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(getCredentialOne.response.signature)))
-      console.log('One Signature As Base64: ', getCredentialOneSignatureAsBase64)
-      const getCredentialOneUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(getCredentialOne.response.userHandle))
-      console.log('One User Handle As String: ', getCredentialOneUserHandleAsString)
-      const getCredentialOneAuthenticatorDataAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(getCredentialOne.response.authenticatorData)))
-      console.log('One Authenticator Data As Base64: ', getCredentialOneAuthenticatorDataAsBase64)
-      console.log('One Authenticator Data: ', getCredentialOne.response.authenticatorData)
+        const firstUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
 
-      console.log('------BEGIN GET CREDENTIAL 2ND TIME------')
+        console.log('First userHandle:', firstUserId)
 
-      const getCredentialTwo = await navigator.credentials.get(credential)
-      console.log('Two response:', getCredentialTwo.response)
-      const getCredentialTwoSignatureAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(getCredentialTwo.response.signature)))
-      console.log('Two Signature As Base64: ', getCredentialTwoSignatureAsBase64)
-      const getCredentialTwoUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(getCredentialTwo.response.userHandle))
-      console.log('Two User Handle As String: ', getCredentialTwoUserHandleAsString)
-      const getCredentialTwoAuthenticatorDataAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(getCredentialTwo.response.authenticatorData)))
-      console.log('Two Authenticator Data As Base64: ', getCredentialTwoAuthenticatorDataAsBase64)
-      console.log('Two Authenticator Data: ', getCredentialTwo.response.authenticatorData)
+        const firstCreatedCredential = await this.createPublicKeyCredential(firstUserId)
 
-      console.log(
-        'Is .get() userHandle String the same every time as put into user.id on create(): ',
-        getCredentialOneUserHandleAsString===getCredentialTwoUserHandleAsString && decryptKeyIntoUserIdOnCreate===getCredentialOneUserHandleAsString
-      )
+        const firstCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(firstCreatedCredential.rawId)))
+
+        console.log('------END CREATE CREDENTIALS 1------')
+
+
+        console.log('------BEGIN CREATE CREDENTIALS 2------')
+
+        const secondUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
+
+        console.log('Second userHandle:', secondUserId)
+
+        const secondCreatedCredential = await this.createPublicKeyCredential(secondUserId)
+
+        const secondCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(secondCreatedCredential.rawId)))
+
+        console.log('------END CREATE CREDENTIALS 2------')
+
+
+        console.log('------BEGIN GET CREDENTIALS FROM KEY------')
+
+        const retrievedCredentialFromKey = await navigator.credentials.get({
+          publicKey: {
+            challenge: window.crypto.getRandomValues(new Uint8Array(10)),
+            timeout: 60000, // 1 minutes to open vault, or you need a new challenge.
+            allowCredentials: [
+              {
+                type: 'public-key',
+                id: Uint8Array.from(atob(firstCredentialIdAsBase64), c => c.charCodeAt(0))
+              },
+              {
+                type: 'public-key',
+                id: Uint8Array.from(atob(secondCredentialIdAsBase64), c => c.charCodeAt(0))
+              }
+            ]
+          }
+        })
+
+        const retrievedUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(retrievedCredentialFromKey.response.userHandle))
+
+        console.log('Success: retrieved userHandle = ', retrievedUserHandleAsString)
+
+        console.log('------END GET CREDENTIALS FROM KEY------')
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 }

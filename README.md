@@ -1,29 +1,22 @@
-# yubikey
+# Security Key Authenticator Test
 
-## Project setup
-```
-npm install
-```
+Code in src/App.vue
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## Issue
 
-### Run your tests
-```
-npm run test
-```
+Solo Key version 1 behaves differently to Solo Key version 2 and Yubi Key
 
-### Lints and fixes files
+Scenario:
+
+* Store 2 credentials on the same key with different userId/userHandle using WebAuthn navigator.credentials.create() credential type PublicKey
+
+* Use WebAuthn navigator.credentials.get() passing in an array of the two returned credential ids
+
+* Expected behaviour: security authenticator key to authenticate and returned the 1st matched credential stored on the key. Solo Key V2 and Yubi Key do this.
+
+* Actual behaviour: Solo Key v1 throws an error:
 ```
-npm run lint
+DOMException: The operation either timed out or was not allowed. See: https://www.w3.org/TR/webauthn-2/#sctn-privacy-considerations-client.
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
