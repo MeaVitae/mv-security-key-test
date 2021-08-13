@@ -20,3 +20,4 @@ Scenario:
 DOMException: The operation either timed out or was not allowed. See: https://www.w3.org/TR/webauthn-2/#sctn-privacy-considerations-client.
 ```
 
+Open web browser console to see behaviour - https://mv-security-key-test.pages.dev/
