@@ -106,7 +106,7 @@ export default {
 
         const retrievedUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(retrievedCredentialFromKey.response.userHandle))
 
-        console.log('Success: retrieved userHandle = ', retrievedUserHandleAsString)
+        console.log((retrievedUserHandleAsString && `Success: retrieved userHandle = ${retrievedUserHandleAsString}`) || 'FAIL, NO RETRIEVED USER userHandle')
 
         console.log('------END GET CREDENTIALS FROM KEY------')
       } catch (error) {
