@@ -102,6 +102,8 @@ export default {
           }
         })
 
+        console.log('Stored credential retrieved from key: ', retrievedCredentialFromKey.response)
+
         const retrievedUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(retrievedCredentialFromKey.response.userHandle))
 
         console.log('Success: retrieved userHandle = ', retrievedUserHandleAsString)
