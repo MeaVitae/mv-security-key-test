@@ -1,12 +1,23 @@
 <template>
   <div id="app">
-    TEST KEY IMPLEMENTATION
+    <div>TEST KEY IMPLEMENTATION</div>
+    <ol>
+      <li v-for="message in messages" :key="message">
+        {{ message }}
+      </li>
+    </ol>
   </div>
 </template>
 
 <script>
 export default {
   name: 'App',
+
+  data() {
+    return {
+      messages: []
+    }
+  },
 
   async mounted () {
     await this.runKeyTest()
@@ -57,33 +68,38 @@ export default {
       }
 
       try {
-        console.log('------BEGIN CREATE CREDENTIALS 1------')
+        this.messages.push('------BEGIN CREATE CREDENTIALS 1------')
+        console.log(this.messages[0])
 
         const firstUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
-
-        console.log('First userHandle:', firstUserId)
+        this.messages.push('First userHandle:' + firstUserId)
+        console.log(this.messages[1])
 
         const firstCreatedCredential = await this.createPublicKeyCredential(firstUserId)
-
         const firstCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(firstCreatedCredential.rawId)))
+        this.messages.push('First firstCredentialIdAsBase64:' + firstCredentialIdAsBase64)
+        console.log(this.messages[2])
 
-        console.log('------END CREATE CREDENTIALS 1------')
+        this.messages.push('------END CREATE CREDENTIALS 1------')
+        console.log(this.messages[3])
 
-
-        console.log('------BEGIN CREATE CREDENTIALS 2------')
+        this.messages.push('------BEGIN CREATE CREDENTIALS 2------')
+        console.log(this.messages[4])
 
         const secondUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
-
-        console.log('Second userHandle:', secondUserId)
+        this.messages.push('Second userHandle:' + secondUserId)
+        console.log(this.messages[5])
 
         const secondCreatedCredential = await this.createPublicKeyCredential(secondUserId)
-
         const secondCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(secondCreatedCredential.rawId)))
+        this.messages.push('Second secondCredentialIdAsBase64:' + secondCredentialIdAsBase64)
+        console.log(this.messages[6])
 
-        console.log('------END CREATE CREDENTIALS 2------')
+        this.messages.push('------END CREATE CREDENTIALS 2------')
+        console.log(this.messages[7])
 
-
-        console.log('------BEGIN GET CREDENTIALS FROM KEY------')
+        this.messages.push('------BEGIN GET CREDENTIALS FROM KEY------')
+        console.log(this.messages[8])
 
         const retrievedCredentialFromKey = await navigator.credentials.get({
           publicKey: {
@@ -102,13 +118,15 @@ export default {
           }
         })
 
-        console.log('Stored credential retrieved from key: ', retrievedCredentialFromKey.response)
+        console.log('retrievedCredentialFromKey.response: ', retrievedCredentialFromKey.response)
 
         const retrievedUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(retrievedCredentialFromKey.response.userHandle))
 
-        console.log((retrievedUserHandleAsString && `Success: retrieved userHandle = ${retrievedUserHandleAsString}`) || 'FAIL, NO RETRIEVED USER userHandle')
+        this.messages.push((retrievedUserHandleAsString && `Success: retrieved userHandle = ${retrievedUserHandleAsString}`) || 'FAIL, NO RETRIEVED USER userHandle')
+        console.log(this.messages[9])
 
-        console.log('------END GET CREDENTIALS FROM KEY------')
+        this.messages.push('------END GET CREDENTIALS FROM KEY------')
+        console.log(this.messages[10])
       } catch (error) {
         console.error(error)
       }
