@@ -71,40 +71,40 @@ export default {
       }
 
       try {
-        this.messages.push('------BEGIN CREATE CREDENTIALS 1------')
-        console.log(this.messages[0])
+        // this.messages.push('------BEGIN CREATE CREDENTIALS 1------')
+        // console.log(this.messages[0])
 
-        const firstUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
-        this.messages.push('First userHandle:' + firstUserId)
-        console.log(this.messages[1])
+        // const firstUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
+        // this.messages.push('First userHandle:' + firstUserId)
+        // console.log(this.messages[1])
 
-        const firstCreatedCredential = await this.createPublicKeyCredential(firstUserId)
-        const firstCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(firstCreatedCredential.rawId)))
-        this.messages.push('First firstCredentialIdAsBase64:' + firstCredentialIdAsBase64)
-        console.log(this.messages[2])
+        // const firstCreatedCredential = await this.createPublicKeyCredential(firstUserId)
+        // const firstCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(firstCreatedCredential.rawId)))
+        // this.messages.push('First firstCredentialIdAsBase64:' + firstCredentialIdAsBase64)
+        // console.log(this.messages[2])
 
-        this.messages.push('------END CREATE CREDENTIALS 1------')
-        console.log(this.messages[3])
+        // this.messages.push('------END CREATE CREDENTIALS 1------')
+        // console.log(this.messages[3])
 
-        this.messages.push('------BEGIN CREATE CREDENTIALS 2------')
-        console.log(this.messages[4])
+        // this.messages.push('------BEGIN CREATE CREDENTIALS 2------')
+        // console.log(this.messages[4])
 
-        const secondUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
-        this.messages.push('Second userHandle:' + secondUserId)
-        console.log(this.messages[5])
+        // const secondUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
+        // this.messages.push('Second userHandle:' + secondUserId)
+        // console.log(this.messages[5])
 
-        const secondCreatedCredential = await this.createPublicKeyCredential(secondUserId)
-        const secondCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(secondCreatedCredential.rawId)))
-        this.messages.push('Second secondCredentialIdAsBase64:' + secondCredentialIdAsBase64)
-        console.log(this.messages[6])
+        // const secondCreatedCredential = await this.createPublicKeyCredential(secondUserId)
+        // const secondCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(secondCreatedCredential.rawId)))
+        // this.messages.push('Second secondCredentialIdAsBase64:' + secondCredentialIdAsBase64)
+        // console.log(this.messages[6])
 
-        this.messages.push('------END CREATE CREDENTIALS 2------')
-        console.log(this.messages[7])
+        // this.messages.push('------END CREATE CREDENTIALS 2------')
+        // console.log(this.messages[7])
 
         this.messages.push('------BEGIN GET CREDENTIALS FROM KEY------')
         console.log(this.messages[8])
 
-        // const testCredentialIdRegisteredOnSecurityKey = '1SNV2I5AKvUkKkUOln+BLTQlBnvq81qVoTh/DxiAG9Lvelh1tNZGMbuwqBLZ0cUS'
+        const testCredentialIdRegisteredOnSecurityKey = 'Z3/fpqw31h7arCwBeQ6MOZOAqC23ybPOy8gAyvax6uhglyfIljPf7MbYm4C+vtZP'
 
         const retrievedCredentialFromKey = await navigator.credentials.get({
           publicKey: {
@@ -112,19 +112,20 @@ export default {
             challenge: window.crypto.getRandomValues(new Uint8Array(10)),
             timeout: 60000, // 1 minute
             userVerification: 'required',
+            transport: ['usb', 'nfc'],
             allowCredentials: [
-              {
-                type: 'public-key',
-                id: Uint8Array.from(atob(firstCredentialIdAsBase64), c => c.charCodeAt(0))
-              },
-              {
-                type: 'public-key',
-                id: Uint8Array.from(atob(secondCredentialIdAsBase64), c => c.charCodeAt(0))
-              }
               // {
               //   type: 'public-key',
-              //   id: Uint8Array.from(atob(testCredentialIdRegisteredOnSecurityKey), c => c.charCodeAt(0))
+              //   id: Uint8Array.from(atob(firstCredentialIdAsBase64), c => c.charCodeAt(0))
+              // },
+              // {
+              //   type: 'public-key',
+              //   id: Uint8Array.from(atob(secondCredentialIdAsBase64), c => c.charCodeAt(0))
               // }
+              {
+                type: 'public-key',
+                id: Uint8Array.from(atob(testCredentialIdRegisteredOnSecurityKey), c => c.charCodeAt(0))
+              }
             ]
           }
         })
