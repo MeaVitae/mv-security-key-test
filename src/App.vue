@@ -28,41 +28,45 @@ export default {
 
   methods: {
     async createPublicKeyCredential (userId = '') {
-      return navigator.credentials.create({
-        publicKey: {
-          challenge: window.crypto.getRandomValues(new Uint8Array(10)),
+      const createPublicKeyOptions = {
+        challenge: window.crypto.getRandomValues(new Uint8Array(10)),
 
-          rp: {
-            name: 'Test',
-            id: this.rpId
-          },
+        rp: {
+          name: 'Test',
+          id: this.rpId
+        },
 
-          user: {
-            id: Uint8Array.from(userId, c => c.charCodeAt(0)),
-            name: 'Test Person',
-            displayName: 'jim display'
-          },
+        user: {
+          id: Uint8Array.from(userId, c => c.charCodeAt(0)),
+          name: 'Test Person',
+          displayName: 'jim display'
+        },
 
-          pubKeyCredParams: [
-            { type: 'public-key', alg: -7 },
-            { type: 'public-key', alg: -257 }
-          ],
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7 },
+          { type: 'public-key', alg: -257 }
+        ],
 
-          authenticatorSelection: {
-            userVerification: 'required',
-            residentKey: 'required',
-            authenticatorAttachment: 'cross-platform'
-          },
+        authenticatorSelection: {
+          userVerification: 'required',
+          residentKey: 'required',
+          authenticatorAttachment: 'cross-platform'
+        },
 
-          timeout: 120000, // 2 minutes
+        timeout: 120000, // 2 minutes
 
-          excludeCredentials: [],
+        excludeCredentials: [],
 
-          extensions: {
-            loc: true
-          }
+        extensions: {
+          loc: true
         }
-      })
+      }
+
+      console.log(createPublicKeyOptions)
+
+      return navigator.credentials.create({
+          publicKey: createPublicKeyOptions
+        })
     },
 
     async runKeyTest () {
@@ -107,12 +111,11 @@ export default {
 
         const testCredentialIdRegisteredOnSecurityKey = 'Z3/fpqw31h7arCwBeQ6MOZOAqC23ybPOy8gAyvax6uhglyfIljPf7MbYm4C+vtZP'
 
-        const retrievedCredentialFromKey = await navigator.credentials.get({
-          publicKey: {
+        const getPublicKeyOptions = {
             rpId: this.rpId,
             challenge: window.crypto.getRandomValues(new Uint8Array(10)),
             timeout: 60000, // 1 minute
-            userVerification: 'discouraged', // 'required',
+            userVerification: 'required',
             transport: ['usb', 'nfc'],
             allowCredentials: [
               // {
@@ -129,6 +132,12 @@ export default {
               }
             ]
           }
+
+        this.messages.push(JSON.stringify(getPublicKeyOptions, null, 2))
+        console.log(getPublicKeyOptions)
+
+        const retrievedCredentialFromKey = await navigator.credentials.get({
+          publicKey: getPublicKeyOptions
         })
 
         console.log('retrievedCredentialFromKey.response: ', retrievedCredentialFromKey.response)
@@ -136,12 +145,12 @@ export default {
         const retrievedUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(retrievedCredentialFromKey.response.userHandle))
 
         this.messages.push((retrievedUserHandleAsString && `Success: retrieved userHandle = ${retrievedUserHandleAsString}`) || 'FAIL, NO RETRIEVED USER userHandle')
-        console.log(this.messages[9])
+        console.log(this.messages[10])
 
         this.messages.push('------END GET CREDENTIALS FROM KEY------')
-        console.log(this.messages[10])
+        console.log(this.messages[11])
       } catch (error) {
-        this.error = error.message
+        this.error = JSON.stringfy(error, null, 2)
         console.error(error)
       }
     }
