@@ -16,6 +16,7 @@ export default {
 
   data() {
     return {
+      rpId: 'security-key.meavitae.com',
       error: '',
       messages: []
     }
@@ -33,7 +34,7 @@ export default {
 
           rp: {
             name: 'Test',
-            id: 'security-key.meavitae.com'
+            id: this.rpId
           },
 
           user: {
@@ -108,10 +109,10 @@ export default {
 
         const retrievedCredentialFromKey = await navigator.credentials.get({
           publicKey: {
-            rpId: 'security-key.meavitae.com',
+            rpId: this.rpId,
             challenge: window.crypto.getRandomValues(new Uint8Array(10)),
             timeout: 60000, // 1 minute
-            userVerification: 'required',
+            userVerification: 'discouraged', // 'required',
             transport: ['usb', 'nfc'],
             allowCredentials: [
               // {
