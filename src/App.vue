@@ -150,7 +150,7 @@ export default {
         this.messages.push('------END GET CREDENTIALS FROM KEY------')
         console.log(this.messages[11])
       } catch (error) {
-        this.error = JSON.stringfy(error, null, 2)
+        this.error = `${error.name} - ${error.message} - ${error.stack}`
         console.error(error)
       }
     }
