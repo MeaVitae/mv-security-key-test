@@ -6,6 +6,7 @@
         {{ message }}
       </li>
     </ol>
+    <div>{{error}}
   </div>
 </template>
 
@@ -15,6 +16,7 @@ export default {
 
   data() {
     return {
+      error: '',
       messages: []
     }
   },
@@ -30,7 +32,8 @@ export default {
           challenge: window.crypto.getRandomValues(new Uint8Array(10)),
 
           rp: {
-            name: 'Test'
+            name: 'Test',
+            id: 'security-key.meavitae.com'
           },
 
           user: {
@@ -128,6 +131,7 @@ export default {
         this.messages.push('------END GET CREDENTIALS FROM KEY------')
         console.log(this.messages[10])
       } catch (error) {
+        this.error = error.message
         console.error(error)
       }
     }
