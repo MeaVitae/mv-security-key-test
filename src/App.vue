@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div>TEST KEY IMPLEMENTATION - v1.01</div>
+    <div>TEST KEY IMPLEMENTATION - v1.02</div>
 
     <button
       v-if="!credentials.length"
