@@ -1,7 +1,19 @@
 <template>
   <div id="app">
     <div>TEST KEY IMPLEMENTATION - v1.01</div>
-    <button @click="runKeyTest">Start Authentication</button>
+    <button
+      v-if="!credentialIds.length"
+      @click="create"
+    >
+      Create Authentication
+    </button>
+
+    <button
+      v-else
+      @click="get"
+    >
+      Check Authentication
+    </button>
 
     <ol>
       <li v-for="message in messages" :key="message">
@@ -20,7 +32,8 @@ export default {
     return {
       rpId: 'security-key.meavitae.com',
       error: '',
-      messages: []
+      messages: [],
+      credentials: []
     }
   },
 
@@ -64,12 +77,18 @@ export default {
 
       console.log(createPublicKeyOptions)
 
-      return navigator.credentials.create({
+      const credential = await navigator.credentials.create({
           publicKey: createPublicKeyOptions
         })
+
+      const credentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(credential.rawId)))
+      this.credentials.push({
+        credentialId: credentialIdAsBase64,
+        userHandle: userId
+      })
     },
 
-    async runKeyTest () {
+    async create () {
       if (!window.PublicKeyCredential) {
         return alert(`Your web browser does not meet our security requirements.  Please
         upgrade to Google Chrome or contact MeaVitae support for help.`)
@@ -106,6 +125,14 @@ export default {
         this.messages.push('------END CREATE CREDENTIALS 2------')
         console.log(this.messages[7])
 
+      } catch (error) {
+        this.error = `${error.name} - ${error.message} - ${error.stack}`
+        console.error(error)
+      }
+    },
+
+    async get () {
+      try {
         this.messages.push('------BEGIN GET CREDENTIALS FROM KEY------')
         console.log(this.messages[8])
 
@@ -116,20 +143,11 @@ export default {
             challenge: window.crypto.getRandomValues(new Uint8Array(10)),
             timeout: 60000, // 1 minute
             userVerification: 'required',
-            allowCredentials: [
-              {
+            allowCredentials: this.credentials
+              .map(({ credentialId }) => ({
                 type: 'public-key',
-                id: Uint8Array.from(atob(firstCredentialIdAsBase64), c => c.charCodeAt(0))
-              },
-              {
-                type: 'public-key',
-                id: Uint8Array.from(atob(secondCredentialIdAsBase64), c => c.charCodeAt(0))
-              }
-              // {
-              //   type: 'public-key',
-              //   id: Uint8Array.from(atob(testCredentialIdRegisteredOnSecurityKey), c => c.charCodeAt(0))
-              // }
-            ]
+                id: Uint8Array.from(atob(credentialId), c => c.charCodeAt(0))
+              }))
           }
 
         this.messages.push(JSON.stringify(getPublicKeyOptions, null, 2))
