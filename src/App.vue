@@ -116,17 +116,17 @@ export default {
         this.messages.push('------END CREATE CREDENTIALS 1------')
         this.consoleLogLastMessage()
 
-        this.messages.push('------BEGIN CREATE CREDENTIALS 2------')
-        this.consoleLogLastMessage()
+        // this.messages.push('------BEGIN CREATE CREDENTIALS 2------')
+        // this.consoleLogLastMessage()
 
-        const secondUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
-        this.messages.push('Second userHandle:' + secondUserId)
-        this.consoleLogLastMessage()
+        // const secondUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
+        // this.messages.push('Second userHandle:' + secondUserId)
+        // this.consoleLogLastMessage()
 
-        await this.createPublicKeyCredential(secondUserId)
+        // await this.createPublicKeyCredential(secondUserId)
         
-        this.messages.push('------END CREATE CREDENTIALS 2------')
-        this.consoleLogLastMessage()
+        // this.messages.push('------END CREATE CREDENTIALS 2------')
+        // this.consoleLogLastMessage()
 
       } catch (error) {
         this.error = `${error.name} - ${error.message} - ${error.stack}`
