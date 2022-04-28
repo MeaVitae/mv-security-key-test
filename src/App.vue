@@ -29,6 +29,8 @@ export default {
   methods: {
     async createPublicKeyCredential (userId = '') {
       const createPublicKeyOptions = {
+        // attestation: 'direct', // 
+
         challenge: window.crypto.getRandomValues(new Uint8Array(10)),
 
         rp: {
@@ -49,7 +51,7 @@ export default {
 
         authenticatorSelection: {
           userVerification: 'required',
-          residentKey: 'required',
+          residentKey: 'required', // authenticator must create/store a discoverable credential (a.k.a. resident key, userHandle)
           authenticatorAttachment: 'cross-platform'
         },
 
@@ -115,8 +117,7 @@ export default {
             rpId: this.rpId,
             challenge: window.crypto.getRandomValues(new Uint8Array(10)),
             timeout: 60000, // 1 minute
-            userVerification: 'required',
-            transport: ['usb', 'nfc'],
+            userVerification: 'discouraged',
             allowCredentials: [
               // {
               //   type: 'public-key',
