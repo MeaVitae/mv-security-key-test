@@ -1,8 +1,9 @@
 <template>
   <div id="app">
     <div>TEST KEY IMPLEMENTATION - v1.01</div>
+
     <button
-      v-if="!credentialIds.length"
+      v-if="!credentials.length"
       @click="create"
     >
       Create Authentication
@@ -20,7 +21,8 @@
         {{ message }}
       </li>
     </ol>
-    <div>{{error}}
+
+    <div>{{error}}</div>
   </div>
 </template>
 
