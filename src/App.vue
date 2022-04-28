@@ -160,7 +160,8 @@ export default {
           publicKey: getPublicKeyOptions
         })
 
-        console.log('retrievedCredentialFromKey.response: ', retrievedCredentialFromKey.response)
+        this.messages.push(`retrievedCredentialFromKey.response: ${JSON.stringify(retrievedCredentialFromKey.response, null, 2)}`)
+        this.consoleLogLastMessage()
 
         const retrievedUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(retrievedCredentialFromKey.response.userHandle))
 
