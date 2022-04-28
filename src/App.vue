@@ -40,6 +40,10 @@ export default {
   },
 
   methods: {
+    consoleLogLastMessage () {
+      console.log(this.messages[this.messages.length - 1])
+    },
+
     async createPublicKeyCredential (userId = '') {
       const createPublicKeyOptions = {
         // attestation: 'direct', // 
@@ -80,14 +84,17 @@ export default {
       console.log(createPublicKeyOptions)
 
       const credential = await navigator.credentials.create({
-          publicKey: createPublicKeyOptions
-        })
+        publicKey: createPublicKeyOptions
+      })
 
       const credentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(credential.rawId)))
       this.credentials.push({
         credentialId: credentialIdAsBase64,
         userHandle: userId
       })
+
+      this.messages.push('credentialIdAsBase64:' + credentialIdAsBase64)
+      this.consoleLogLastMessage()
     },
 
     async create () {
@@ -98,34 +105,28 @@ export default {
 
       try {
         this.messages.push('------BEGIN CREATE CREDENTIALS 1------')
-        console.log(this.messages[0])
+        this.consoleLogLastMessage()
 
         const firstUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
         this.messages.push('First userHandle:' + firstUserId)
-        console.log(this.messages[1])
+        this.consoleLogLastMessage()
 
-        const firstCreatedCredential = await this.createPublicKeyCredential(firstUserId)
-        const firstCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(firstCreatedCredential.rawId)))
-        this.messages.push('First firstCredentialIdAsBase64:' + firstCredentialIdAsBase64)
-        console.log(this.messages[2])
+        await this.createPublicKeyCredential(firstUserId)
 
         this.messages.push('------END CREATE CREDENTIALS 1------')
-        console.log(this.messages[3])
+        this.consoleLogLastMessage()
 
         this.messages.push('------BEGIN CREATE CREDENTIALS 2------')
-        console.log(this.messages[4])
+        this.consoleLogLastMessage()
 
         const secondUserId = `STATIC:${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 4)}`
         this.messages.push('Second userHandle:' + secondUserId)
-        console.log(this.messages[5])
+        this.consoleLogLastMessage()
 
-        const secondCreatedCredential = await this.createPublicKeyCredential(secondUserId)
-        const secondCredentialIdAsBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(secondCreatedCredential.rawId)))
-        this.messages.push('Second secondCredentialIdAsBase64:' + secondCredentialIdAsBase64)
-        console.log(this.messages[6])
-
+        await this.createPublicKeyCredential(secondUserId)
+        
         this.messages.push('------END CREATE CREDENTIALS 2------')
-        console.log(this.messages[7])
+        this.consoleLogLastMessage()
 
       } catch (error) {
         this.error = `${error.name} - ${error.message} - ${error.stack}`
@@ -136,7 +137,7 @@ export default {
     async get () {
       try {
         this.messages.push('------BEGIN GET CREDENTIALS FROM KEY------')
-        console.log(this.messages[8])
+        this.consoleLogLastMessage()
 
         // const testCredentialIdRegisteredOnSecurityKey = 'Z3/fpqw31h7arCwBeQ6MOZOAqC23ybPOy8gAyvax6uhglyfIljPf7MbYm4C+vtZP'
 
@@ -164,10 +165,10 @@ export default {
         const retrievedUserHandleAsString = String.fromCharCode.apply(null, new Uint8Array(retrievedCredentialFromKey.response.userHandle))
 
         this.messages.push((retrievedUserHandleAsString && `Success: retrieved userHandle = ${retrievedUserHandleAsString}`) || 'FAIL, NO RETRIEVED USER userHandle')
-        console.log(this.messages[10])
+        this.consoleLogLastMessage()
 
         this.messages.push('------END GET CREDENTIALS FROM KEY------')
-        console.log(this.messages[11])
+        this.consoleLogLastMessage()
       } catch (error) {
         this.error = `${error.name} - ${error.message} - ${error.stack}`
         console.error(error)
