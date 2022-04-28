@@ -1,6 +1,8 @@
 <template>
   <div id="app">
     <div>TEST KEY IMPLEMENTATION</div>
+    <button @click="runKeyTest">Start Authentication</button>
+
     <ol>
       <li v-for="message in messages" :key="message">
         {{ message }}
@@ -20,10 +22,6 @@ export default {
       error: '',
       messages: []
     }
-  },
-
-  async mounted () {
-    await this.runKeyTest()
   },
 
   methods: {
@@ -117,7 +115,7 @@ export default {
             rpId: this.rpId,
             challenge: window.crypto.getRandomValues(new Uint8Array(10)),
             timeout: 60000, // 1 minute
-            userVerification: 'discouraged',
+            userVerification: 'required',
             allowCredentials: [
               // {
               //   type: 'public-key',
